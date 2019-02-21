@@ -1,7 +1,9 @@
 from mininet.topo import Topo
 
 class MyTopo( Topo ):
-    def __init__( self ):
+    def myTopology( self ):
+        
+        Topo.__init__( self )
 
         # Add hosts and switches
         host1 = self.addHost( 'h1' )
@@ -18,5 +20,11 @@ class MyTopo( Topo ):
         self.addLink( host3, switch2 )
         self.addLink( host4, switch2 )
 
-topos = { 'mytopo': ( lambda: MyTopo() ) }
+
+def main():
+    mytopo = MyTopo()
+    mytopo.myTopology()
+
+if __name__ == '__main__':
+    main()
         
