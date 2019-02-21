@@ -25,6 +25,5 @@ def main():
     mytopo = MyTopo()
     mytopo.myTopology()
 
-if __name__ == '__main__':
-    main()
+topos = {'mytopo' , main}
         
