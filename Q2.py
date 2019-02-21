@@ -24,5 +24,5 @@ class MyTopo( Topo ):
 def main():
     mytopo = MyTopo()
 
-topos = {'mytopo' : main}
+topos = {'mytopo' : main()}
         
