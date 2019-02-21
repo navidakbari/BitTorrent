@@ -2,8 +2,6 @@ from mininet.topo import Topo
 
 class MyTopo( Topo ):
     def __init__( self ):
-        
-        Topo.__init__( self )
 
         # Add hosts and switches
         host1 = self.addHost( 'h1' )
