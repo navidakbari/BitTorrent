@@ -1,4 +1,5 @@
 from mininet.topo import Topo
+from mininet.link import TCLink
 
 class MyTopo( Topo ):
     def build( self ):
