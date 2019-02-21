@@ -13,11 +13,11 @@ class MyTopo( Topo ):
         switch2 = self.addSwitch( 's2' )
 
         # Add links and set their delay
-        self.addLink( host1, switch1 , delay = '20ms')
-        self.addLink( host2, switch1 , delay = '20ms')
-        self.addLink( switch1, switch2 , delay = '50ms')
-        self.addLink( host3, switch2 , delay = '15ms')
-        self.addLink( host4, switch2, delay = '1s')
+        self.addLink( host1, switch1 , delay = '20ms' , cls = TCLink)
+        self.addLink( host2, switch1 , delay = '20ms' , cls = TCLink)
+        self.addLink( switch1, switch2 , delay = '50ms' , cls = TCLink)
+        self.addLink( host3, switch2 , delay = '15ms' , cls = TCLink)
+        self.addLink( host4, switch2, delay = '1s' , cls = TCLink)
 
 
 topos = {'mytopo' : MyTopo}
