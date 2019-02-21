@@ -1,7 +1,7 @@
 from mininet.topo import Topo
 from mininet.link import TCLink
 
-class MyTopo( Topo ):
+class TwoSwitchFourHostTopo( Topo ):
     def build( self ):
 
         # Add hosts and switches
