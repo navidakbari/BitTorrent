@@ -1,7 +1,7 @@
 from mininet.topo import Topo
 
 class MyTopo( Topo ):
-    def myTopology( self ):
+    def __init__( self ):
         
         Topo.__init__( self )
 
@@ -23,7 +23,6 @@ class MyTopo( Topo ):
 
 def main():
     mytopo = MyTopo()
-    mytopo.myTopology()
 
 topos = {'mytopo' : main}
         
