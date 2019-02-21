@@ -20,5 +20,5 @@ class TwoSwitchFourHostTopo( Topo ):
         self.addLink( host4, switch2, delay = '1s' , cls = TCLink)
 
 
-topos = {'mytopo' : MyTopo}
+topos = {'mytopo' : TwoSwitchFourHostTopo}
         
