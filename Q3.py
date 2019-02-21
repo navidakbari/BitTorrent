@@ -5,7 +5,7 @@ from mininet.link import TCLink
 from mininet.util import dumpNodeConnections
 from mininet.log import setLogLevel
 
-class TowHostMultiSwitch( Topo ):
+class TwoHostMultiSwitch( Topo ):
     def build( self, n=2 ):
 	host1 = self.addHost('host1')
 	host2 = self.addHost('host2')
@@ -19,7 +19,7 @@ class TowHostMultiSwitch( Topo ):
 	self.addLink(host1 , switch[0] , bw = 1 , delay = '20ms' , max_queue_size = 1)
 	self.addLink(host2 , switch[-1] , bw = 1 , delay = '20ms' , max_queue_size = 1)
 
-mytopo = {'mytopo' : TowHostMultiSwitch}
+topos  = {'mytopo' : TwoHostMultiSwitch}
 
 
 
