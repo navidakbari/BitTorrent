@@ -70,7 +70,8 @@ class Response(object):
 		self.destination_ip = None
 
 class Ping(object):
-	def __init__(self, source, destination, timeout=1000, packet_size=55, own_id=None, quiet_output=False, udp=False, bind=None):
+	def __init__(self, source, destination, timeout=1000, packet_size=55, own_id=None, quiet_output=False, udp=False, bind=None, payload = "testData"):
+		self.payload = payload
 		self.quiet_output = quiet_output
 		if quiet_output:
 			self.response = Response()
@@ -296,10 +297,10 @@ class Ping(object):
 				)
 				raise etype, evalue, etb
 			raise # raise the original error
-		receive_time, packet_size, ip, ip_header, icmp_header , payLoad = self.receive_one_ping(current_socket)
+		receive_time, packet_size, src_ip, dest_ip, ip_header, icmp_header , payLoad= self.receive_one_ping(current_socket)
 		current_socket.close()
 
-		return packet_size , ip, ip_header, icmp_header , payLoad
+		return packet_size ,  src_ip, dest_ip, ip_header, icmp_header , payLoad
 
 	def do(self):
 		
@@ -363,7 +364,7 @@ class Ping(object):
 
 		#inlude a small payload inside the ICMP packet
 		#and have the ip packet contain the ICMP packet
-		icmp.contains(ImpactPacket.Data("testData"))
+		icmp.contains(ImpactPacket.Data(self.payload))
 		ip.contains(icmp)
 		
 
@@ -399,7 +400,7 @@ class Ping(object):
 			inputready, outputready, exceptready = select.select([current_socket], [], [], timeout)
 			select_duration = (default_timer() - select_start)
 			if inputready == []: # timeout
-				return None, 0, 0, 0, 0 , 0
+				return None, 0, 0, 0, 0 , 0,0
 
 
 			packet_data, address = current_socket.recvfrom(ICMP_MAX_RECV)
@@ -429,13 +430,14 @@ class Ping(object):
 				)
 				payLoad = packet_data[28:]
 				packet_size = len(packet_data) - 28
-				ip = socket.inet_ntoa(struct.pack("!I", ip_header["src_ip"]))
+				src_ip = socket.inet_ntoa(struct.pack("!I", ip_header["src_ip"]))
+				dest_ip = socket.inet_ntoa(struct.pack("!I", ip_header["dest_ip"]))
 
-				return receive_time, packet_size, ip, ip_header, icmp_header , payLoad
+				return receive_time, packet_size, src_ip, dest_ip, ip_header, icmp_header , payLoad
 
 			timeout = timeout - select_duration
 			if timeout <= 0:
-				return None, 0, 0, 0, 0 , 0
+				return None, 0, 0, 0, 0 , 0, 0
 
 def ping(source, hostname, timeout=1000, count=3, packet_size=55, *args, **kwargs):
 	p = Ping(source, hostname, timeout, packet_size, *args, **kwargs)

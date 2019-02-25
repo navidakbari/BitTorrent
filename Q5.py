@@ -7,14 +7,18 @@ import socket
 numberOfClient = 5
 
 def main():
-    while(True):
-        sourceIp = findRandomIp()
+#     while(True):
+# 	    send()
+	Server = Ping('10.0.0.1' , '10.0.0.5')
+	Server.do_send() 
+def send():
+	sourceIp = findRandomIp()
 	destinationIp = findRandomIp()
 	while destinationIp == sourceIp:
 		 destinationIp = findRandomIp()
 	print "from %s to %s" % (sourceIp, destinationIp)
         Server = Ping(sourceIp , destinationIp)
-        Server.do_send()        
+        Server.do_send() 
 def findRandomIp():   
 	hostname = socket.gethostname()    
 	#ip = socket.gethostbyname(hostname)
