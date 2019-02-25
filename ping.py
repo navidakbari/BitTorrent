@@ -296,10 +296,10 @@ class Ping(object):
 				)
 				raise etype, evalue, etb
 			raise # raise the original error
-		receive_time, packet_size, ip, ip_header, icmp_header , packet_date = self.receive_one_ping(current_socket)
+		receive_time, packet_size, ip, ip_header, icmp_header , payLoad = self.receive_one_ping(current_socket)
 		current_socket.close()
 
-		return packet_date
+		return packet_size , ip, ip_header, icmp_header , payLoad
 
 	def do(self):
 		
@@ -403,7 +403,7 @@ class Ping(object):
 
 
 			packet_data, address = current_socket.recvfrom(ICMP_MAX_RECV)
-
+			
 			icmp_header = self.header2dict(
 				names=[
 					"type", "code", "checksum",
@@ -427,11 +427,11 @@ class Ping(object):
 					struct_format="!BBHHHBBHII",
 					data=packet_data[:20]
 				)
-				
+				payLoad = packet_data[28:]
 				packet_size = len(packet_data) - 28
 				ip = socket.inet_ntoa(struct.pack("!I", ip_header["src_ip"]))
-				# XXX: Why not ip = address[0] ???
-				return receive_time, packet_size, ip, ip_header, icmp_header , packet_data
+
+				return receive_time, packet_size, ip, ip_header, icmp_header , payLoad
 
 			timeout = timeout - select_duration
 			if timeout <= 0:

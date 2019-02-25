@@ -8,15 +8,13 @@ numberOfClient = 5
 
 def main():
     while(True):
-
         sourceIp = findRandomIp()
 	destinationIp = findRandomIp()
 	while destinationIp == sourceIp:
 		 destinationIp = findRandomIp()
 	print "from %s to %s" % (sourceIp, destinationIp)
         Server = Ping(sourceIp , destinationIp)
-        Server.do_send()
-        
+        Server.do_send()        
 def findRandomIp():   
 	hostname = socket.gethostname()    
 	#ip = socket.gethostbyname(hostname)
