@@ -399,7 +399,7 @@ class Ping(object):
 			inputready, outputready, exceptready = select.select([current_socket], [], [], timeout)
 			select_duration = (default_timer() - select_start)
 			if inputready == []: # timeout
-				return None, 0, 0, 0, 0
+				return None, 0, 0, 0, 0 , 0
 
 
 			packet_data, address = current_socket.recvfrom(ICMP_MAX_RECV)
@@ -435,7 +435,7 @@ class Ping(object):
 
 			timeout = timeout - select_duration
 			if timeout <= 0:
-				return None, 0, 0, 0, 0
+				return None, 0, 0, 0, 0 , 0
 
 def ping(source, hostname, timeout=1000, count=3, packet_size=55, *args, **kwargs):
 	p = Ping(source, hostname, timeout, packet_size, *args, **kwargs)

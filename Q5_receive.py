@@ -1,4 +1,4 @@
-import ping
+from ping import Ping
 
 numberOfClinet = 5
 
