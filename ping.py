@@ -384,8 +384,7 @@ class Ping(object):
 def ping(source, hostname, timeout=1000, count=3, packet_size=55, *args, **kwargs):
 	p = Ping(source, hostname, timeout, packet_size, *args, **kwargs)
 	return p.run(count)
-
-ping(Your IP Address, Destination IP Address)    #put your IP and destination IP address as the ping function argument and run the code. you can ping 
+    #put your IP and destination IP address as the ping function argument and run the code. you can ping 
 												 #the destination with your own code!!!
 
 
