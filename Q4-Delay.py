@@ -7,7 +7,7 @@ from mininet.log import setLogLevel
 
 class TwoHostMultiSwitch( Topo ):
     def build( self, n=2 ):
-    d = '20ms'
+	d = '90ms'
 	host1 = self.addHost('host1')
 	host2 = self.addHost('host2')
 	switch = []
