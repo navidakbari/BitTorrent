@@ -7,8 +7,8 @@ def main():
     while(True):
         
         p = Ping('10.0.0.2' , '10.0.0.1')
-        temp = p.do_receive()
-        print temp
+        packet_size , ip, ip_header, icmp_header , payLoad = p.do_receive()
+        print packet_size , ip, ip_header, icmp_header , payLoad
         
         
 if __name__ == "__main__":

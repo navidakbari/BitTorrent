@@ -7,12 +7,11 @@ numberOfClinet = 5
 
 def main():
     while(True):
-
-        sourceIp = findRandomIp()
+		sourceIp = findRandomIp()
 		destinationIp = findRandomIp()
 		print "from %s to %s" % (sourceIp, destinationIp)
-        Server = Ping(sourceIp , destination)
-        Server.do_send()
+		Server = Ping(sourceIp , destination)
+		Server.do_send()
         
 def findRandomIp():
 	ip = commands.getoutput('/sbin/ifconfig').split('\n')[1][27:28]
