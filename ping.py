@@ -15,7 +15,7 @@ import sys
 import time
 import socket,sys
 from impacket import ImpactPacket
-import ifaddr
+#import ifaddr
 
 
 
