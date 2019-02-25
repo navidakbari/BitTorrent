@@ -8,7 +8,7 @@ def main():
         
         p = Ping('10.0.0.2' , '10.0.0.1')
         packet_size , ip, ip_header, icmp_header , payLoad = p.do_receive()
-        print packet_size , ip, ip_header, icmp_header , payLoad
+        print "PayLoad is %s"%(payLoad)
         
         
 if __name__ == "__main__":
