@@ -54,7 +54,6 @@ def to_ip(addr):
 		return addr
 	return socket.gethostbyname(addr)
 
-
 class Response(object):
 	def __init__(self):
 		self.max_rtt = None
@@ -246,6 +245,7 @@ class Ping(object):
 		self.print_exit()
 		if self.quiet_output:
 			return self.response
+	
 	def do_send(self):
 		# Send one ICMP ECHO_REQUEST and receive the response until self.timeout
 		
@@ -296,10 +296,10 @@ class Ping(object):
 				)
 				raise etype, evalue, etb
 			raise # raise the original error
-		receive_time, packet_size, ip, ip_header, icmp_header = self.receive_one_ping(current_socket)
+		receive_time, packet_size, ip, ip_header, icmp_header , packet_date = self.receive_one_ping(current_socket)
 		current_socket.close()
 
-		return receive_time
+		return packet_date
 
 	def do(self):
 		
@@ -365,6 +365,7 @@ class Ping(object):
 		#and have the ip packet contain the ICMP packet
 		icmp.contains(ImpactPacket.Data("testData"))
 		ip.contains(icmp)
+		
 
 
 		#give the ICMP packet some ID
@@ -426,10 +427,11 @@ class Ping(object):
 					struct_format="!BBHHHBBHII",
 					data=packet_data[:20]
 				)
+				
 				packet_size = len(packet_data) - 28
 				ip = socket.inet_ntoa(struct.pack("!I", ip_header["src_ip"]))
 				# XXX: Why not ip = address[0] ???
-				return receive_time, packet_size, ip, ip_header, icmp_header
+				return receive_time, packet_size, ip, ip_header, icmp_header , packet_data
 
 			timeout = timeout - select_duration
 			if timeout <= 0:
