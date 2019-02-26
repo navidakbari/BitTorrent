@@ -75,6 +75,7 @@ class Ping(object):
 			self.response.destination = destination
 			self.response.timeout = timeout
 			self.response.packet_size = packet_size
+		
 
 		self.destination = destination
 		self.source = source
@@ -82,6 +83,7 @@ class Ping(object):
 		self.packet_size = packet_size
 		self.udp = udp
 		self.bind = bind
+		self.current_socket = 0
 
 		if own_id is None:
 			self.own_id = os.getpid() & 0xFFFF
@@ -243,8 +245,7 @@ class Ping(object):
 		self.print_exit()
 		if self.quiet_output:
 			return self.response
-	
-	def do_send(self):
+	def get_socket(self):
 		# Send one ICMP ECHO_REQUEST and receive the response until self.timeout
 		
 		try: 
@@ -266,38 +267,26 @@ class Ping(object):
 				)
 				raise etype, evalue, etb
 			raise # raise the original error
-		send_time = self.send_one_ping(current_socket)
+
+		self.current_socket = current_socket
+		return self.current_socket
+
+	def do_send(self):
+		# Send one ICMP ECHO_REQUEST and receive the response until self.timeout
+		
+		send_time = self.send_one_ping(self.current_socket)
 		if send_time == None:
 			return
 		self.send_count += 1
-		current_socket.close()
 
 	def do_receive(self):
 		# Send one ICMP ECHO_REQUEST and receive the response until self.timeout
 		
-		try: 
-			current_socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
-			current_socket.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
 
-			# Bind the socket to a source address
-			if self.bind:
-				print('self.bind: ', self.bind)
-				current_socket.bind((self.bind, 0)) # Port number is irrelevant for ICMP
-
-		except socket.error, (errno, msg):
-			if errno == 1:
-				# Operation not permitted - Add more information to traceback
-				#the code should run as administrator
-				etype, evalue, etb = sys.exc_info()
-				evalue = etype(
-					"%s - Note that ICMP messages can only be sent from processes running as root." % evalue
-				)
-				raise etype, evalue, etb
-			raise # raise the original error
-		receive_time, packet_size, src_ip, dest_ip, ip_header, icmp_header , payLoad= self.receive_one_ping(current_socket)
-		current_socket.close()
+		receive_time, packet_size, src_ip, dest_ip, ip_header, icmp_header , payLoad= self.receive_one_ping(self.current_socket)
 		self.payload = payLoad
 		return packet_size ,  src_ip, dest_ip, ip_header, icmp_header , payLoad
+
 	def set_new_config(self, src, dst, payLoad):
 		self.source = src
 		self.destination = dst
