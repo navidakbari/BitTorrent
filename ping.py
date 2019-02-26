@@ -15,8 +15,6 @@ import sys
 import time
 import socket,sys
 from impacket import ImpactPacket
-#import ifaddr
-
 
 
 if sys.platform.startswith("win32"):
@@ -33,7 +31,6 @@ ICMP_ECHO = 8 # Echo request (per RFC792)
 ICMP_MAX_RECV = 2048 # Max size of incoming buffer
 
 MAX_SLEEP = 1000
-
 
 
 def is_valid_ip4_address(addr):
@@ -442,11 +439,3 @@ class Ping(object):
 			timeout = timeout - select_duration
 			if timeout <= 0:
 				return None, 0, 0, 0, 0 , 0, 0
-
-def ping(source, hostname, timeout=1000, count=3, packet_size=55, *args, **kwargs):
-	p = Ping(source, hostname, timeout, packet_size, *args, **kwargs)
-	return p.run(count)
-    #put your IP and destination IP address as the ping function argument and run the code. you can ping 
-												 #the destination with your own code!!!
-
-
