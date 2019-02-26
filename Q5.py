@@ -1,16 +1,28 @@
-from ping import ping
+import ping
 from ping import Ping
 from random import randint
 import random
 import commands
 import socket
-numberOfClient = 5
+import sys
+import threading 
 
-def main():
-#     while(True):
-# 	    send()
-	Server = Ping('10.0.0.1' , '10.0.0.5')
-	Server.do_send() 
+numberOfClient = 5
+protocolTag = '~'
+
+def splitFile(fileName = 'test.txt'):
+	f = open(fileName, 'rb')
+	result = []
+	try:
+		byte = f.read(1)
+		result.append(str(byte))
+		while byte != "":
+			byte = f.read(1)
+			result.append(str(byte))
+	finally:
+		f.close()
+	return result
+
 def send():
 	sourceIp = findRandomIp()
 	destinationIp = findRandomIp()
@@ -18,7 +30,8 @@ def send():
 		 destinationIp = findRandomIp()
 	print "from %s to %s" % (sourceIp, destinationIp)
         Server = Ping(sourceIp , destinationIp)
-        Server.do_send() 
+        Server.do_send()
+
 def findRandomIp():   
 	hostname = socket.gethostname()    
 	#ip = socket.gethostbyname(hostname)
@@ -33,6 +46,62 @@ def findRandomIp():
 			ipFounded = True
 
 	return newIpToJoin
+
+def senderFunction():
+
+def receiverFunction():
+
+def main(isSender = False):
+	isSender = (sys.argv[1].lower() == 'true')
+	
+	if(isSender):
+
+		#fileName = raw_input("file name: ")
+
+		t1 = threading.Thread(target=print_square, args=(10,)) 
+		t2 = threading.Thread(target=print_cube, args=(10,)) 
+	
+		# starting thread 1 
+		t1.start() 
+		# starting thread 2 
+		t2.start() 
+	
+		# wait until thread 1 is completely executed 
+		t1.join() 
+		# wait until thread 2 is completely executed 
+		t2.join()
+		#split file
+		fileData = splitFile(fileName = 'test.txt')
 		
+		#send file
+		i = 0
+		while i < len(fileData):
+			data = ''
+			for j in range(i , i + 7):
+				if j < len(fileData):
+					data += fileData[j]
+			print (data) 
+			payload = '0' + protocolTag + data + protocolTag + '%s'%(i/8)
+			Ping(findRandomIp() , findRandomIp() , payload = payload).do_send()
+			i = i + 8
+		#return home
+
+		#receive file
+
+	else:
+		p = Ping('0.0.0.0' , '0.0.0.0')
+		while(True):
+			packet_size , src_ip, dest_ip, ip_header, icmp_header , payLoad = p.do_receive()
+			if not packet_size == 0:
+				if(icmp_header['type'] == ping.ICMP_ECHOREPLY):
+					sourceIp = findRandomIp()
+					destinationIp = findRandomIp()
+				while destinationIp == sourceIp:
+					destinationIp = findRandomIp()
+					print "random src is %s and dst is %s"%(sourceIp, destinationIp)
+					p = Ping(sourceIp, destinationIp)
+				p.do_send()			
+			print "PayLoad is %s"%(payLoad)
+
 if __name__ == "__main__":
-    main()
+    main(isSender=False)
