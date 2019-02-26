@@ -299,9 +299,13 @@ class Ping(object):
 			raise # raise the original error
 		receive_time, packet_size, src_ip, dest_ip, ip_header, icmp_header , payLoad= self.receive_one_ping(current_socket)
 		current_socket.close()
-
+		self.payload = payLoad
 		return packet_size ,  src_ip, dest_ip, ip_header, icmp_header , payLoad
-
+	def set_new_config(self, src, dst, payLoad):
+		self.source = src
+		self.destination = dst
+		self.payload = payLoad
+		
 	def do(self):
 		
 		# Send one ICMP ECHO_REQUEST and receive the response until self.timeout
