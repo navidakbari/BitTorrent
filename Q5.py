@@ -16,8 +16,10 @@ import select
 
 numberOfClient = 5
 protocolTag = '~'
+returnHome = False
+returnIp = 0
 
-def splitFile(fileName = 'test.txt'):
+def splitFile(fileName):
 	f = open(fileName, 'rb')
 	result = []
 	try:
@@ -41,9 +43,7 @@ def send():
         Server.do_send()
 
 def findRandomIp():   
-	hostname = socket.gethostname()    
-	#ip = socket.gethostbyname(hostname)
-	#print ip  
+	hostname = socket.gethostname()     
 	ip = commands.getoutput('/sbin/ifconfig').split('\n')[1][20:28]
 	ipFounded = False
 	newIpToJoin = ""
@@ -52,12 +52,18 @@ def findRandomIp():
 		newIpToJoin = "10.0.0." + str(newIpToJoin)
 		if not newIpToJoin == ip:
 			ipFounded = True
-
 	return newIpToJoin
+
+def getRandomSourceAndDestination():
+        sourceIp = findRandomIp()
+        destinationIp = findRandomIp()
+        while destinationIp == sourceIp :
+                destinationIp = findRandomIp()
+        return sourceIp, destinationIp
 
 def senderFunction(p):
 	fileName = raw_input("file name: ")
-	#split file
+
 	fileData = splitFile(fileName)
 
 	#send file
@@ -72,20 +78,50 @@ def senderFunction(p):
 		for j in range(i , i + 8):
 			if j < len(fileData):
 				data += fileData[j]
-		payload = 'noReturn' + protocolTag + data + protocolTag + '%s'%(i/8) + protocolTag + str(length) + protocolTag  + '0' + protocolTag + fileName
+		payload = '0' + protocolTag + data + protocolTag + '%s'%(i/8) + protocolTag + str(length) + protocolTag  + '0' + protocolTag + fileName
 		src, dst = getRandomSourceAndDestination()
 		p.set_new_config( src,dst, payload)
-		# print "sending %s"%(i/8)
 		p.do_send()
 		i = i + 8
 
 def downloadFunction(p):
 	fileName = raw_input("file name: ")
 	ourIp = commands.getoutput('/sbin/ifconfig').split('\n')[1][20:28]
-	msg = 'return~'+ ourIp +'~0~3~0~0~' + fileName
+	msg = 'return~'+ ourIp +'~0~0~0~' + fileName
 	src, dst = getRandomSourceAndDestination()
 	p.set_new_config(src, dst, msg)
 	p.do_send()
+
+def receiverFunction(p):
+	global returnHome
+	global returnIp
+
+	packet_size , src_ip, dest_ip, ip_header, icmp_header , payLoad = p.do_receive()
+
+	if not packet_size == 0:
+		payloadData = payLoad.split('~')
+		if(payloadData[0] == 'return'): #If msg was return to home
+			returnIp = payloadData[1]
+			returnHome = True
+
+		if(icmp_header['type'] == ping.ICMP_ECHOREPLY):
+			# print "PayLoad is %s"%(payLoad)
+			if(payloadData[4] == '1'):
+				print "***********Deleting"
+			elif(returnHome and (not payloadData[0] == 'return')):
+					payloadData[4] = '1'
+					payLoad = '~'.join(payloadData)
+					print "************Sending to Home %s"%(returnIp)
+					ourIp = commands.getoutput('/sbin/ifconfig').split('\n')[1][20:28]
+					p.set_new_config(ourIp, returnIp, payLoad)
+					# time.sleep(1)
+					p.do_send()
+			else : 
+				sourceIp, destinationIp = getRandomSourceAndDestination()
+				# print "random src is %s and dst is %s"%(sourceIp, destinationIp)
+				p.set_new_config(sourceIp, destinationIp, payLoad)
+				# time.sleep(1)
+				p.do_send()
 
 def main():
 	p = Ping('0.0.0.0', '0.0.0.0')
@@ -106,50 +142,6 @@ def main():
 				elif buffer[i] == "download":
 					downloadFunction(p)
 			buffer = []
-
-		
-	
-
-
-
-	
-        
-def receiverFunction(p):
-	returnHome = False
-	returnIp = 0
-	packet_size , src_ip, dest_ip, ip_header, icmp_header , payLoad = p.do_receive()
-	if not packet_size == 0:
-		payloadData = payLoad.split('~')
-		if(payloadData[0] == 'return'): #If msg was return to home
-			returnIp = payloadData[1]
-			returnHome = True
-		if(icmp_header['type'] == ping.ICMP_ECHOREPLY):
-			print "PayLoad is %s"%(payLoad)
-			if(payloadData[4] == '1'):
-				print "***********Deleting"
-			elif(returnHome):
-				if(not payloadData[0] == 'return') :
-					payloadData[4] = '1'
-					payLoad = '~'.join(payloadData)
-					print "************Sending to Home %s"%(returnIp)
-					ourIp = commands.getoutput('/sbin/ifconfig').split('\n')[1][20:28];
-					p.set_new_config(ourIp, returnIp, payLoad)
-					# time.sleep(1)
-					p.do_send()
-			else : 
-				sourceIp, destinationIp = getRandomSourceAndDestination()
-				# print "random src is %s and dst is %s"%(sourceIp, destinationIp)
-				p.set_new_config(sourceIp, destinationIp, payLoad)
-				# time.sleep(1)
-				p.do_send()
-        
-
-def getRandomSourceAndDestination():
-        sourceIp = findRandomIp()
-        destinationIp = findRandomIp()
-        while destinationIp == sourceIp :
-                destinationIp = findRandomIp()
-        return sourceIp, destinationIp
 	
 if __name__ == "__main__":
     main()
